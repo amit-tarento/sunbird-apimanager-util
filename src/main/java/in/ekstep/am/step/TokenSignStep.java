@@ -1,13 +1,26 @@
 package in.ekstep.am.step;
 
-import in.ekstep.am.dto.token.TokenSignRequest;
-import in.ekstep.am.jwt.*;
 import in.ekstep.am.builder.TokenSignResponseBuilder;
+import in.ekstep.am.dto.token.TokenSignRequest;
+import in.ekstep.am.external.AmResponse;
+import in.ekstep.am.external.learner.LearnerApi;
+import in.ekstep.am.jwt.Base64Util;
+import in.ekstep.am.jwt.GsonUtil;
+import in.ekstep.am.jwt.JWTUtil;
+import in.ekstep.am.jwt.KeyData;
+import in.ekstep.am.jwt.KeyManager;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+import org.springframework.util.StringUtils;
+
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static java.text.MessageFormat.format;
@@ -23,15 +36,21 @@ public class TokenSignStep implements TokenStep {
     TokenSignRequest token;
     @Autowired
     private KeyData keyData;
+    @Autowired
+    private LearnerApi learnerApi;
+    @Autowired
+    private Environment environment;
 
     private String currentToken, kid, iss;
     private Map headerData, bodyData;
     private long offlineTokenValidity, currentTime, tokenWasIssuedAt, tokenValidTill, tokenExpiry;
 
-    public TokenSignStep(TokenSignRequest token, TokenSignResponseBuilder tokenSignResponseBuilder, KeyManager keyManager) {
-        this.token = token;
-        this.tokenSignResponseBuilder = tokenSignResponseBuilder;
-        this.keyManager = keyManager;
+    public TokenSignStep(TokenSignRequest token, TokenSignResponseBuilder tokenSignResponseBuilder, KeyManager keyManager, LearnerApi learnerApi, Environment environment) {
+      this.token = token;
+      this.tokenSignResponseBuilder = tokenSignResponseBuilder;
+      this.keyManager = keyManager;
+      this.learnerApi = learnerApi;
+      this.environment = environment;
     }
 
     private boolean isJwtTokenValid() {
@@ -154,6 +173,17 @@ public class TokenSignStep implements TokenStep {
         body.put("sub", bodyData.get("sub"));
         body.put("typ", "Bearer");
 
+        if (Boolean.parseBoolean(environment.getProperty("embed.role"))) {
+          try {
+            AmResponse response = learnerApi.getUserRolesById(getLmsUserId((String) bodyData.get("sub")));
+            Map<String,Object> learnerResponse = GsonUtil.fromJson(response.body(),Map.class);
+            List<Map<String,Object>> roles = appendRoles(learnerResponse);
+            body.put("roles", roles);
+          } catch (Exception ex) {
+            log.error(format("Exception occurred while fetching user roles for id {0}", bodyData.get("sub")));
+          }
+        }
+
         tokenSignResponseBuilder.setAccessToken(JWTUtil.createRS256Token(header, body, keyData.getPrivateKey()));
         tokenSignResponseBuilder.setRefreshToken(currentToken);
         tokenSignResponseBuilder.setExpiresIn(exp - currentTime);
@@ -178,6 +208,32 @@ public class TokenSignStep implements TokenStep {
         else {
             log.info("Token issued for UID: " + body.get("sub") + ", aud: " + body.get("aud") + ", exp: " + body.get("exp") + ", iat: " + body.get("iat"));
         }
+    }
+
+    private List<Map<String,Object>> appendRoles(Map<String, Object> learnerResponse) {
+      if (MapUtils.isNotEmpty(learnerResponse)) {
+        Map<String,Object> result = (Map<String, Object>) learnerResponse.get("result");
+        if (MapUtils.isNotEmpty(result)) {
+          List<Map<String,Object>> roles = (List<Map<String,Object>>)result.get("roles");
+          if (CollectionUtils.isNotEmpty(roles)) {
+            roles.stream().forEach(role -> {
+              role.remove("createdBy");
+              role.remove("createdDate");
+              role.remove("updatedBy");
+              role.remove("updatedDate");
+            });
+            return roles;
+          }
+        }
+      }
+      return Collections.emptyList();
+    }
+
+    private String getLmsUserId(String fedUserId) {
+      if (!StringUtils.isEmpty(fedUserId) && fedUserId.startsWith("f:")) {
+        return fedUserId.substring(fedUserId.lastIndexOf(":")+1);
+      }
+      return fedUserId;
     }
 
     @Override

@@ -2,6 +2,8 @@ package in.ekstep.am.config;
 
 import in.ekstep.am.external.AmAdminApi;
 import in.ekstep.am.external.AmAdminApiClient;
+import in.ekstep.am.external.learner.LearnerApi;
+import in.ekstep.am.external.learner.LearnerApiClient;
 import okhttp3.OkHttpClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -33,5 +35,15 @@ public class AdminUtilConfiguration {
   @Bean("default.consumer.group")
   public String defaultConsumerGroup() {
     return environment.getProperty("default.consumer.group");
+  }
+
+  @Bean("learner.base.api.url")
+  public String learnerBaseApiUrl() {
+    return environment.getProperty("learner.base.api.url");
+  }
+
+  @Bean("learner.api.client")
+  public LearnerApi learnerApi() {
+    return new LearnerApiClient();
   }
 }
