@@ -26,7 +26,7 @@ public class LearnerApiClient implements LearnerApi {
   @Override
   public AmResponse getUserRolesById(String userId, Map<String, String> headers) throws Exception {
     Request request = new Request.Builder()
-      .url(format( learnerApiBaseUrl+"/private/user/v1/role/read/{0}", userId))
+      .url(format( learnerApiBaseUrl+"/user/v1/role/read/{0}", userId))
       .method("GET", null)
       .addHeader("Accept", "application/json")
       .addHeader("Content-Type", "application/json")
