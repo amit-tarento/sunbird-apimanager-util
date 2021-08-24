@@ -18,6 +18,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -175,7 +176,7 @@ public class TokenSignStep implements TokenStep {
 
         if (Boolean.parseBoolean(environment.getProperty("embed.role"))) {
           try {
-            AmResponse response = learnerApi.getUserRolesById(getLmsUserId((String) bodyData.get("sub")));
+            AmResponse response = learnerApi.getUserRolesById(getLmsUserId((String) bodyData.get("sub")), token.getHeaders());
             Map<String,Object> learnerResponse = GsonUtil.fromJson(response.body(),Map.class);
             List<Map<String,Object>> roles = appendRoles(learnerResponse);
             body.put("roles", roles);
@@ -226,7 +227,11 @@ public class TokenSignStep implements TokenStep {
           }
         }
       }
-      return Collections.emptyList();
+      //if user role empty , pass PUBLIC Role
+      List<Map<String,Object>> roles = new ArrayList<>();
+      Map<String,Object> role = new HashMap<>();
+      role.put("role","PUBLIC");
+      return roles;
     }
 
     private String getLmsUserId(String fedUserId) {
