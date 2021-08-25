@@ -176,7 +176,7 @@ public class TokenSignStep implements TokenStep {
 
         if (Boolean.parseBoolean(environment.getProperty("embed.role"))) {
           try {
-            AmResponse response = learnerApi.getUserRolesById(getLmsUserId((String) bodyData.get("sub")), token.getHeaders());
+            AmResponse response = learnerApi.getUserRolesById(getLmsUserId((String) bodyData.get("sub")));
             Map<String,Object> learnerResponse = GsonUtil.fromJson(response.body(),Map.class);
             List<Map<String,Object>> roles = appendRoles(learnerResponse);
             body.put("roles", roles);

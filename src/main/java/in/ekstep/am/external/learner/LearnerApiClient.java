@@ -22,15 +22,19 @@ public class LearnerApiClient implements LearnerApi {
   @Qualifier("learner.base.api.url")
   private String learnerApiBaseUrl;
 
+  @Autowired
+  @Qualifier("learner.api.auth.key")
+  private String learnerApiBearerKey;
+
 
   @Override
-  public AmResponse getUserRolesById(String userId, Map<String, String> headers) throws Exception {
+  public AmResponse getUserRolesById(String userId) throws Exception {
     Request request = new Request.Builder()
       .url(format( learnerApiBaseUrl+"/user/v1/role/read/{0}", userId))
       .method("GET", null)
       .addHeader("Accept", "application/json")
       .addHeader("Content-Type", "application/json")
-      .addHeader("Authorization",headers.get("Authorization"))
+      .addHeader("Authorization","Bearer "+learnerApiBearerKey)
       .build();
     return executeRequest(request);
   }

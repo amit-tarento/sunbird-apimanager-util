@@ -12,8 +12,6 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import in.ekstep.am.dto.token.TokenSignRequest;
 
-import java.util.Map;
-
 @RestController
 public class TokenSignController {
 
@@ -23,7 +21,7 @@ public class TokenSignController {
     private TokenSignStepChain tokenSignStepChain;
 
     @PostMapping(path = "/v1/auth/refresh/token", consumes = "application/x-www-form-urlencoded", produces = "application/json")
-    public ResponseEntity<TokenSignResponse> verifyAndSendNewToken(TokenSignRequest tokenSignRequest, BindingResult bindingResult, @RequestHeader Map<String, String> headers) {
+    public ResponseEntity<TokenSignResponse> verifyAndSendNewToken(TokenSignRequest tokenSignRequest, BindingResult bindingResult) {
         TokenSignResponseBuilder tokenSignResponseBuilder = new TokenSignResponseBuilder();
         try {
             if (bindingResult.hasErrors()) {
@@ -34,7 +32,6 @@ public class TokenSignController {
                 return tokenSignResponseBuilder.badRequest(bindingResult);
 
             tokenSignResponseBuilder.markSuccess();
-            tokenSignRequest.setHeaders(headers);
             tokenSignStepChain.execute(tokenSignRequest, tokenSignResponseBuilder);
             return tokenSignResponseBuilder.response();
         }

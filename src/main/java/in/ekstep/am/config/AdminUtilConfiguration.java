@@ -46,4 +46,9 @@ public class AdminUtilConfiguration {
   public LearnerApi learnerApi() {
     return new LearnerApiClient();
   }
+
+  @Bean("learner.api.auth.key")
+  public String learnerApiBearerKey() {
+    return environment.getProperty("learner.api.auth.key");
+  }
 }
