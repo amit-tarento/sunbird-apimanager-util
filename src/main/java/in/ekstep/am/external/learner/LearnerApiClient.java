@@ -30,7 +30,7 @@ public class LearnerApiClient implements LearnerApi {
   @Override
   public AmResponse getUserRolesById(String userId) throws Exception {
     Request request = new Request.Builder()
-      .url(format( learnerApiBaseUrl+"/user/v1/role/read/{0}", userId))
+      .url(format( learnerApiBaseUrl+"/v1/user/role/read/{0}", userId))
       .method("GET", null)
       .addHeader("Accept", "application/json")
       .addHeader("Content-Type", "application/json")
@@ -42,7 +42,8 @@ public class LearnerApiClient implements LearnerApi {
   private AmResponse executeRequest(Request request) throws Exception {
     Response response = null;
     try {
-      response = okHttpClient.newCall(request).execute();
+      response = okHttpClient
+        .newCall(request).execute();
       return new AmResponse(response.code(), response.body().string());
     } finally {
       //Response body must be closed for all requests
