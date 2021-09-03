@@ -1,7 +1,5 @@
 package in.ekstep.am.dto.token;
 
-import java.util.Map;
-
 public class TokenSignRequest {
 
     private String refresh_token;
