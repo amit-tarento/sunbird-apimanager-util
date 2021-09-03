@@ -32,6 +32,7 @@ public class LearnerApiClient implements LearnerApi {
     Request request = new Request.Builder()
       .url(format( learnerApiBaseUrl+"/user/v1/role/read/{0}", userId))
       .method("GET", null)
+      .addHeader("Connection","keep-alive")
       .addHeader("Accept", "application/json")
       .addHeader("Content-Type", "application/json")
       .addHeader("Authorization","Bearer "+learnerApiBearerKey)
