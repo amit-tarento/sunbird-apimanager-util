@@ -9,7 +9,6 @@ import in.ekstep.am.jwt.GsonUtil;
 import in.ekstep.am.jwt.JWTUtil;
 import in.ekstep.am.jwt.KeyData;
 import in.ekstep.am.jwt.KeyManager;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -229,6 +228,7 @@ public class TokenSignStep implements TokenStep {
     List<Map<String,Object>> roles = new ArrayList<>();
     Map<String,Object> role = new HashMap<>();
     role.put("role","PUBLIC");
+    roles.add(role);
     return roles;
   }
 
