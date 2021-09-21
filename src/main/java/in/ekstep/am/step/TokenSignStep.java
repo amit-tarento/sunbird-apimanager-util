@@ -9,6 +9,7 @@ import in.ekstep.am.jwt.GsonUtil;
 import in.ekstep.am.jwt.JWTUtil;
 import in.ekstep.am.jwt.KeyData;
 import in.ekstep.am.jwt.KeyManager;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -214,7 +215,10 @@ public class TokenSignStep implements TokenStep {
       if (MapUtils.isNotEmpty(learnerResponse)) {
         Map<String,Object> result = (Map<String, Object>) learnerResponse.get("result");
         if (MapUtils.isNotEmpty(result)) {
-          return  (List<Map<String,Object>>)result.get("roles");
+          List roles =  (List<Map<String,Object>>)result.get("roles");
+          if (CollectionUtils.isNotEmpty(roles)) {
+            return roles;
+          }
         }
       }
     } else {
