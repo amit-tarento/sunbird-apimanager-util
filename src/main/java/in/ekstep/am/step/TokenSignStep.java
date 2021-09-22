@@ -232,6 +232,7 @@ public class TokenSignStep implements TokenStep {
     List<Map<String,Object>> roles = new ArrayList<>();
     Map<String,Object> role = new HashMap<>();
     role.put("role","PUBLIC");
+    role.put("scope",new ArrayList<>());
     roles.add(role);
     return roles;
   }
