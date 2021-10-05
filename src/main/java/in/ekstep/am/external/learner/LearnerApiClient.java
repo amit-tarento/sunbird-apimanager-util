@@ -7,7 +7,6 @@ import okhttp3.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
-import java.util.Map;
 import java.util.Optional;
 
 import static java.text.MessageFormat.format;
@@ -30,7 +29,7 @@ public class LearnerApiClient implements LearnerApi {
   @Override
   public AmResponse getUserRolesById(String userId) throws Exception {
     Request request = new Request.Builder()
-      .url(format( learnerApiBaseUrl+"/user/v1/role/read/{0}", userId))
+      .url(format( learnerApiBaseUrl+"/v1/user/role/read/{0}", userId))
       .method("GET", null)
       .addHeader("Connection","keep-alive")
       .addHeader("Accept", "application/json")
