@@ -6,6 +6,7 @@ import in.ekstep.am.external.learner.LearnerApi;
 import in.ekstep.am.external.learner.LearnerApiClient;
 import okhttp3.OkHttpClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -37,7 +38,7 @@ public class AdminUtilConfiguration {
     return environment.getProperty("default.consumer.group");
   }
 
-  @Bean("learner.base.api.url")
+  @Value(value = "${learner.base.api.url}")
   public String learnerBaseApiUrl() {
     return environment.getProperty("learner.base.api.url");
   }
@@ -47,7 +48,7 @@ public class AdminUtilConfiguration {
     return new LearnerApiClient();
   }
 
-  @Bean("learner.api.auth.key")
+  @Value(value = "${learner.api.auth.key}")
   public String learnerApiBearerKey() {
     return environment.getProperty("learner.api.auth.key");
   }
